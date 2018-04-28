@@ -1,0 +1,48 @@
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>用户</cite></a>
+    <a><cite>用户列表</cite></a>
+  </div>
+</div>
+
+<style>
+/* 这段样式只是用于演示 */
+.layadmin-trailer{position: absolute; left: 0; top: 0; height: 100%; width: 100%; padding: 15px; display: flex; justify-content: center; flex-direction: column; text-align: center; box-sizing: border-box; font-size: 20px; font-weight: 300; color: #ccc;}
+</style>
+
+<div class="layadmin-trailer">
+  <div class="layui-tab-item layui-show">
+  <table class="layui-table" lay-data="{ url:'/demo/table/user/', page:true, id:'idTest'}" lay-filter="demo">
+    <thead>
+    <tr>
+      <th lay-data="{type:'checkbox', fixed: 'left'}"></th>
+      <th lay-data="{field:'id', width:80, sort: true, fixed: true}">ID</th>
+      <th lay-data="{field:'username', width:80}">用户名</th>
+      <th lay-data="{field:'city', width:80}">城市</th>
+      <th lay-data="{field:'sign', width:160}">签名</th>
+      <th lay-data="{field:'experience', width:80, sort: true}">积分</th>
+
+      <th lay-data="{field:'classify', width:80}">职业</th>
+      <th lay-data="{field:'wealth', width:135, sort: true}">财富</th>
+      <th lay-data="{field:'score', width:80, sort: true, fixed: 'right'}">评分</th>
+      <th lay-data="{fixed: 'right', width:178, align:'center', toolbar: '#barDemo'}"></th>
+    </tr>
+    </thead>
+  </table>
+  </div>
+</div>
+
+<script>
+layui.use(['admin'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,router = layui.router();
+
+  element.render();
+  
+  
+});
+</script>

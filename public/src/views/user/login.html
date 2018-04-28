@@ -1,0 +1,91 @@
+
+<script type="text/html" template>
+  <link rel="stylesheet" href="{{ layui.setter.base }}style/login.css?v={{ layui.admin.v }}-1" media="all">
+</script>
+
+
+<div class="layadmin-user-login layadmin-user-display-show" id="LAY-user-login" style="display: none;">
+
+  <div class="layadmin-user-login-main">
+    <div class="layadmin-user-login-box layadmin-user-login-header">
+      <h2>Donfisher's Admin~</h2>
+     <!-- <p>layui 官方出品的单页面后台管理模板系统</p>-->
+    </div>
+    <div class="layadmin-user-login-box layadmin-user-login-body layui-form">
+      <div class="layui-form-item">
+        <label class="layadmin-user-login-icon layui-icon layui-icon-user" for="LAY-user-login-email"></label>
+        <input type="text" name="email" id="LAY-user-login-email" lay-verify="required" placeholder="邮箱" class="layui-input">
+      </div>
+      <div class="layui-form-item">
+        <label class="layadmin-user-login-icon layui-icon layui-icon-password" for="LAY-user-login-password"></label>
+        <input type="password" name="password" id="LAY-user-login-password" lay-verify="required" placeholder="密码" class="layui-input">
+      </div>
+      <div class="layui-form-item">
+        <div class="layui-row">
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <button class="layui-btn layui-btn-fluid" lay-submit lay-filter="LAY-user-login-submit">登 入</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="layui-trans layadmin-user-login-footer">
+
+    <p>© 2018 <a href="https://www.donfisher.cn/" target="_blank">donfisher.cn</a></p>
+    <p>
+
+    </p>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'form', 'user'], function(){
+  var $ = layui.$
+  ,setter = layui.setter
+  ,admin = layui.admin
+  ,form = layui.form
+  ,router = layui.router()
+  ,search = router.search;
+
+  form.render();
+
+  //提交
+  form.on('submit(LAY-user-login-submit)', function(obj){
+
+    //请求登入接口
+    admin.req({
+      url: '../api/user/login' //实际使用请改成服务端真实接口
+      ,data: obj.field
+        ,method:'post'
+      ,done: function(res){
+
+        //请求成功后，写入 access_token
+        layui.data(setter.tableName, {
+          key: setter.request.tokenName
+          ,value: res.data.access_token
+        });
+
+        //登入成功的提示与跳转
+        layer.msg('登入成功', {
+          offset: '15px'
+          ,icon: 1
+          ,time: 1000
+        }, function(){
+          location.hash = search.redirect ? decodeURIComponent(search.redirect) : '/';
+        });
+      }
+    });
+
+  });
+
+
+  //实际使用时记得删除该代码
+/*  layer.msg('为了方便演示，用户名密码可随意输入', {
+    offset: '15px'
+    ,icon: 1
+  });*/
+
+});
+</script>

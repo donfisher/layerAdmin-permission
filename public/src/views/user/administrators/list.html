@@ -1,0 +1,118 @@
+
+
+<title>数据操作 - 数据表格</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>组件</cite></a>
+    <a><cite>数据表格</cite></a>
+    <a><cite>数据操作</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-row layui-col-space15">
+    <div class="layui-col-md12">
+      <div class="layui-card">
+        <div class="layui-card-header">数据操作</div>
+        <div class="layui-card-body">
+          <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
+            <button class="layui-btn" data-type="getCheckData">获取选中行数据</button>
+            <button class="layui-btn" data-type="getCheckLength">获取选中数目</button>
+            <button class="layui-btn" data-type="isAll">验证是否全选</button>
+          </div>
+
+          <table class="layui-hide" id="test-table-operate" lay-filter="test-table-operate"></table>
+
+          <script type="text/html" id="test-table-operate-barDemo">
+<!--            <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>-->
+            <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+          </script>
+          <script type="text/html" id="test-table-switchTpl">
+            <!-- 这里的 checked 的状态只是演示 -->
+            <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|停用" lay-filter="test-table-sexDemo"
+                   value="{{ d.id }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{ d.id == 10003 ? 'checked' : '' }}>
+          </script>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    layui.use(['admin', 'table', 'form'], function(){
+        var table = layui.table
+            ,form = layui.form
+            ,$ = layui.$;
+
+        table.render({
+            elem: '#test-table-operate'
+            ,url: '../api/user/list?token='+layui.data('layuiAdmin').token
+            ,method:'post'
+            ,cols: [[
+                {type:'checkbox', fixed: 'left'}
+                ,{field:'id', width:80, title: 'ID', sort: true, fixed: 'left'}
+                ,{field:'user_name', title: '用户名'}
+                ,{field:'user_email',  title: '邮箱', sort: true}
+                ,{field:'created_at',  title: '创建时间'}
+                ,{title:'状态',  templet: '#test-table-switchTpl',unresize:true}
+                ,{title:'操作',  toolbar: '#test-table-operate-barDemo'}
+
+            ]]
+            ,page: true
+        });
+
+        //监听表格复选框选择
+        table.on('checkbox(test-table-operate)', function(obj){
+            console.log(obj)
+        });
+        //监听工具条
+        table.on('tool(test-table-operate)', function(obj){
+            var data = obj.data;
+            if(obj.event === 'detail'){
+                layer.msg('ID：'+ data.id + ' 的查看操作');
+            } else if(obj.event === 'del'){
+                layer.confirm('真的删除行么', function(index){
+                    obj.del();
+                    layer.close(index);
+                });
+            } else if(obj.event === 'edit'){
+                layer.alert('编辑行：<br>'+ JSON.stringify(data))
+            }
+        });
+
+        //监听性别操作
+        form.on('switch(test-table-sexDemo)', function(obj){
+            var json = JSON.parse(decodeURIComponent($(this).data('json')));
+            layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
+
+            json = table.clearCacheKey(json);
+            console.log(json); //当前行数据
+        });
+
+        var $ = layui.$, active = {
+            getCheckData: function(){ //获取选中数据
+                var checkStatus = table.checkStatus('test-table-operate')
+                    ,data = checkStatus.data;
+                layer.alert(JSON.stringify(data));
+            }
+            ,getCheckLength: function(){ //获取选中数目
+                var checkStatus = table.checkStatus('test-table-operate')
+                    ,data = checkStatus.data;
+                layer.msg('选中了：'+ data.length + ' 个');
+            }
+            ,isAll: function(){ //验证是否全选
+                var checkStatus = table.checkStatus('test-table-operate');
+                layer.msg(checkStatus.isAll ? '全选': '未全选')
+            }
+        };
+
+        $('.test-table-operate-btn .layui-btn').on('click', function(){
+            var type = $(this).data('type');
+            active[type] ? active[type].call(this) : '';
+        });
+
+    });
+</script>
