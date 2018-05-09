@@ -1,0 +1,117 @@
+
+<title>添加权限</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>管理员管理</cite></a>
+    <a><cite>权限管理</cite></a>
+    <a><cite>添加权限</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">添加权限</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" lay-filter="component-form-group">
+        <div class="layui-form-item">
+          <label class="layui-form-label">权限名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="title" lay-filter="p-name" autocomplete="off" lay-data="{{router.search.id}}" placeholder="请输入权限名称" class="layui-input" value="">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">是否启用</label>
+          <div class="layui-input-block">
+            <input type="checkbox" checked="" name="on" lay-skin="switch" lay-filter="component-form-switchTest" lay-text="ON|OFF">
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <div class="layui-footer">
+              <button class="layui-btn" lay-submit="" lay-filter="component-form-demo1">立即提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'form', 'layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,layer = layui.layer
+  ,router = layui.router()
+  ,table = layui.table
+  ,form = layui.form;
+
+
+
+  var permission_status = router.search.status;
+  var permission_id = router.search.id;
+  var permission_name = router.search.name;
+  if(permission_name){
+      $('input[name="name"]').val(router.search.name.replace('%20',' '));
+  }
+  var butt = $('input[name="on"]');
+  if(permission_status == 1){
+      butt.prop('checked',true);
+  }else{
+      butt.prop('checked',false);
+  }
+    form.render(null, 'component-form-group');
+  /* 自定义验证规则 */
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '权限名至少得2个字啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  /* 监听指定开关 */
+  form.on('switch(component-form-switchTest)', function(data){
+/*    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });*/
+    layer.tips('温馨提示：on表示启用，off停用', data.othis)
+  });
+  
+  /* 监听提交 */
+  form.on('submit(component-form-demo1)', function(data){
+      data.field['id'] = permission_id;
+      admin.req({
+          url: '../api/permissions/add?token='+layui.data('layuiAdmin').token
+          ,data: data.field
+          ,async: false
+          ,done: function(res){
+              if(res.code == 0){
+                  layer.msg('权限添加成功', {
+                      offset: '15px'
+                      ,icon: 1
+                      ,time: 1000
+                  });
+              }else{
+                  layer.msg('权限添加失败', {
+                      offset: '15px'
+                      ,icon: 2
+                      ,time: 1000
+                  });
+              }
+              parent.layer.closeAll();
+              parent.layui.table.reload('table-permission');
+          }
+      })
+  });
+});
+</script>

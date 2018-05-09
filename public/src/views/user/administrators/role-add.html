@@ -1,0 +1,160 @@
+
+<title>添加角色</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>管理员管理</cite></a>
+    <a><cite>角色管理</cite></a>
+    <a><cite>添加角色</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">添加角色</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" lay-filter="role-form">
+        <div class="layui-form-item">
+          <label class="layui-form-label">角色名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="title" autocomplete="off" placeholder="请输入角色名称" class="layui-input">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">角色权限</label>
+          <div class="layui-input-block permission">
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <div class="layui-footer">
+              <button class="layui-btn" lay-submit="" lay-filter="role-save">立即提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'form', 'layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,layer = layui.layer
+  ,router = layui.router()
+  ,form = layui.form;
+  //获取可用权限
+  var role_id = router.search.id;
+  if(role_id){
+      //编辑
+
+      admin.req({
+          url: '../api/permissions/allPermission?token='+layui.data('layuiAdmin').token
+          ,data: {id:role_id}
+          ,type:'post'
+          ,async: false
+          ,done: function(res){
+              if(res.code == 0){
+                  var role_name = res.name;
+                  $('input[name="name"]').val(role_name)
+                  var html = '';
+                  for(var i=0;i<res.data.length;i++){
+                      html += ' <input type="checkbox" name="permission['+res.data[i].id+']" '+res.data[i].checked+' title="'+res.data[i].name+'">';
+                  }
+                  $('.permission').append(html)
+              }else{
+                  layer.msg('权限获取失败', {
+                      offset: '15px'
+                      ,icon: 2
+                      ,time: 1000
+                  });
+              }
+
+          }
+      })
+  }else{
+      //新增
+      admin.req({
+          url: '../api/permissions/allPermission?token='+layui.data('layuiAdmin').token
+          ,data: {}
+          ,type:'post'
+          ,async: false
+          ,done: function(res){
+              if(res.code == 0){
+                  var html = '';
+                  for(var i=0;i<res.data.length;i++){
+                      html += ' <input type="checkbox" name="permission['+res.data[i].id+']" title="'+res.data[i].name+'">';
+                  }
+                  $('.permission').append(html)
+              }else{
+                  layer.msg('权限获取失败', {
+                      offset: '15px'
+                      ,icon: 2
+                      ,time: 1000
+                  });
+              }
+
+          }
+      })
+  }
+
+  form.render(null,'role-form');
+
+  
+  /* 自定义验证规则 */
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '权限名至少得2个字啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  /* 监听指定开关 */
+  form.on('switch(component-form-switchTest)', function(data){
+/*    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });*/
+    layer.tips('温馨提示：on表示启用，off停用', data.othis)
+  });
+  
+  /* 监听提交 */
+  form.on('submit(role-save)', function(data){
+      if(role_id){
+          data.field['id'] = role_id;
+      }
+      admin.req({
+          url: '../api/roles/add?token='+layui.data('layuiAdmin').token
+          ,data: data.field
+          ,async: false
+          ,type:'post'
+          ,done: function(res){
+              if(res.code == 0){
+                  layer.msg('角色添加成功', {
+                      offset: '15px'
+                      ,icon: 1
+                      ,time: 1000
+                  });
+              }else{
+                  layer.msg('角色添加失败', {
+                      offset: '15px'
+                      ,icon: 2
+                      ,time: 1000
+                  });
+              }
+              parent.layer.closeAll();
+              parent.layui.table.reload('table-roles');
+          }
+      })
+  });
+});
+</script>

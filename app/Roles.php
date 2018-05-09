@@ -4,12 +4,11 @@ namespace App;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Permission\Traits\HasRoles;
 
-class Client extends Authenticatable
+
+class Roles extends Authenticatable
 {
-    use HasRoles;
-    protected $table = 'Clients';
+    protected $table = 'roles';
     protected $primaryKey = 'id';
     protected $guarded = [];
 }

@@ -6,8 +6,8 @@
   <div class="layui-breadcrumb" lay-filter="breadcrumb">
     <a lay-href="">主页</a>
     <a><cite>管理员管理</cite></a>
-    <a><cite>角色管理</cite></a>
-    <a><cite>角色列表</cite></a>
+    <a><cite>权限管理</cite></a>
+    <a><cite>权限列表</cite></a>
   </div>
 </div>
 
@@ -15,23 +15,24 @@
   <div class="layui-row layui-col-space15">
     <div class="layui-col-md12">
       <div class="layui-card">
-        <div class="layui-card-header">角色列表</div>
+        <div class="layui-card-header">权限列表</div>
         <div class="layui-card-body">
           <div class="layui-btn-group test-table-operate-btn" style="margin-bottom: 10px;">
-            <button class="layui-btn" data-type="getCheckData">添加角色</button>
+            <button class="layui-btn" data-type="getCheckData">添加权限</button>
+
           </div>
 
-          <table class="layui-hide" id="table-roles" lay-filter="test-table-operate"></table>
+          <table class="layui-hide" id="table-permission" lay-filter="test-table-operate"></table>
 
           <script type="text/html" id="test-table-operate-barDemo">
 <!--            <a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看</a>-->
             <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
             <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
           </script>
-          <script type="text/html" id="test-table-switchTpl">
+          <script type="text/html" id="permissionStatus">
             <!-- 这里的 checked 的状态只是演示 -->
-            <input type="checkbox" name="status" lay-skin="switch" lay-text="启用|停用" lay-filter="test-table-sexDemo"
-                   value="{{ d.id }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{ d.id == 10003 ? 'checked' : '' }}>
+            <input type="checkbox" name="status" lay-filter="permissionStatus-on" lay-skin="switch" lay-text="启用|停用"
+                   value="{{ d.id }}" data-json="{{ encodeURIComponent(JSON.stringify(d)) }}" {{ d.status == 1 ? 'checked' : '' }}>
           </script>
         </div>
       </div>
@@ -47,16 +48,16 @@
             ,$ = layui.$;
 
         table.render({
-            elem: '#table-roles'
-            ,url: '../api/roles/lists?token='+layui.data('layuiAdmin').token
+            elem: '#table-permission'
+            ,url: '../api/permissions/lists?token='+layui.data('layuiAdmin').token
             ,method:'post'
             ,cols: [[
                 {type:'checkbox', fixed: 'left'}
                 ,{field:'id', width:80, title: 'ID', sort: true, fixed: 'left'}
-                ,{field:'name', title: '角色名称'}
+                ,{field:'name', title: '权限名称'}
+                ,{field:'status', title: '是否启用',templet:'#permissionStatus'}
                 ,{field:'created_at',  title: '创建时间'}
                 ,{title:'操作',  toolbar: '#test-table-operate-barDemo'}
-
             ]]
             ,page: true
         });
@@ -64,6 +65,7 @@
         //监听表格复选框选择
         table.on('checkbox(test-table-operate)', function(obj){
             console.log(obj)
+
         });
         //监听工具条
         table.on('tool(test-table-operate)', function(obj){
@@ -75,7 +77,7 @@
                     obj.del();
                     layer.close(index);
                     admin.req({
-                        url:'../api/roles/delete?token='+layui.data('layuiAdmin').token,
+                        url:'../api/permissions/delete?token='+layui.data('layuiAdmin').token,
                         type:"post",
                         data:{id:data.id},
                         async:false,
@@ -91,12 +93,12 @@
             } else if(obj.event === 'edit'){
                 layer.open({
                     type: 2,
-                    title: ['编辑角色', 'background-color: #00bb9d;text-align:center;font-size:18px;'],
+                    title: ['编辑权限', 'background-color: #00bb9d;text-align:center;font-size:18px;'],
                     shadeClose: true,
                     shade: false,
                     maxmin: true,
                     area: ['893px', '600px'],
-                    content: '#/user/administrators/role-add/id='+data.id,
+                    content: '#/user/administrators/permission-add/id='+data.id+'/name='+data.name+'/status='+data.status,
                     end: function(){
                         // 如果是通过单击关闭按钮关闭弹出层，父画面没有此表单
                         if($("#popupForm").length === 1){
@@ -107,25 +109,44 @@
             }
         });
 
-        //监听性别操作
-        form.on('switch(test-table-sexDemo)', function(obj){
-            var json = JSON.parse(decodeURIComponent($(this).data('json')));
+        //监听开关操作
+        form.on('switch(permissionStatus-on)', function(obj){
             layer.tips(this.value + ' ' + this.name + '：'+ obj.elem.checked, obj.othis);
-
-            json = table.clearCacheKey(json);
-            console.log(json); //当前行数据
+            var id = this.value;
+            var status = obj.elem.checked?1:0;
+            admin.req({
+                url: '../api/permissions/changeStatus?token='+layui.data('layuiAdmin').token
+                ,data: {id:id,status:status}
+                ,async: false
+                ,type:'post'
+                ,done: function(res){
+                    if(res.code == 0){
+                        layer.msg('操作成功', {
+                            offset: '15px'
+                            ,icon: 1
+                            ,time: 1000
+                        });
+                    }else{
+                        layer.msg('操作失败', {
+                            offset: '15px'
+                            ,icon: 2
+                            ,time: 1000
+                        });
+                    }
+                }
+            })
         });
 
         var $ = layui.$, active = {
             getCheckData: function(){ //获取选中数据
                 layer.open({
                     type: 2,
-                    title: ['添加角色', 'background-color: #00bb9d;text-align:center;font-size:18px;'],
+                    title: ['添加权限', 'background-color: #00bb9d;text-align:center;font-size:18px;'],
                     shadeClose: true,
                     shade: false,
                     maxmin: true,
                     area: ['893px', '600px'],
-                    content: '#/user/administrators/role-add/id=0',
+                    content: '#/user/administrators/permission-add/id=0',
                     end: function(){
                         // 如果是通过单击关闭按钮关闭弹出层，父画面没有此表单
                         if($("#popupForm").length === 1){

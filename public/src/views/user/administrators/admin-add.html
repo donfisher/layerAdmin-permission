@@ -1,0 +1,157 @@
+
+<title>添加权限</title>
+
+<div class="layui-card layadmin-header">
+  <div class="layui-breadcrumb" lay-filter="breadcrumb">
+    <a lay-href="">主页</a>
+    <a><cite>管理员管理</cite></a>
+    <a><cite>权限管理</cite></a>
+    <a><cite>添加权限</cite></a>
+  </div>
+</div>
+
+<div class="layui-fluid">
+  <div class="layui-card">
+    <div class="layui-card-header">添加权限</div>
+    <div class="layui-card-body" style="padding: 15px;">
+      <form class="layui-form" action="" lay-filter="component-form-group">
+        <div class="layui-form-item">
+          <label class="layui-form-label">用户邮箱</label>
+          <div class="layui-input-block">
+            <input type="text" name="email" lay-verify="required" autocomplete="off"  placeholder="请输入email" class="layui-input" value="">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">名称</label>
+          <div class="layui-input-block">
+            <input type="text" name="name" lay-verify="required" lay-filter="p-name" autocomplete="off"  placeholder="请输入用户名" class="layui-input" value="">
+          </div>
+        </div>
+        <div class="layui-form-item">
+          <label class="layui-form-label">密码</label>
+          <div class="layui-input-block">
+            <input type="password" name="password" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input">
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">选择角色</label>
+          <div class="layui-input-block">
+            <select name="role" lay-filter="roles1" class="roles">
+            </select>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">是否启用</label>
+          <div class="layui-input-block">
+            <input type="checkbox" checked="" name="status" lay-skin="switch" lay-filter="component-form-switchTest" lay-text="ON|OFF">
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <div class="layui-input-block">
+            <div class="layui-footer">
+              <button class="layui-btn" lay-submit="" lay-filter="component-form-demo1">立即提交</button>
+              <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+layui.use(['admin', 'form', 'layer'], function(){
+  var $ = layui.$
+  ,admin = layui.admin
+  ,element = layui.element
+  ,layer = layui.layer
+  ,router = layui.router()
+  ,table = layui.table
+  ,form = layui.form;
+  var id = 0;
+  id = router.search.id;
+  //
+    admin.req({
+        url: '../api/roles/allRoles?token='+layui.data('layuiAdmin').token
+        ,data: {id:id}
+        ,type:'post'
+        ,async: false
+        ,done: function(res){
+            if(res.code == 0){
+                var html = '';
+                for(var i=0;i<res.data.length;i++){
+                    html += '  <option value="'+res.data[i].name+'" '+res.data[i].selected+'>'+res.data[i].name+'</option>';
+                }
+                $('.roles').append(html)
+                $('input[name="name"]').val(res.name);
+                $('input[name="email"]').val(res.email);
+                $('input[name="password"]').val('******');
+                var butt = $('input[name="status"]');
+                if(res.status == 1){
+                    butt.prop('checked',true);
+                }else{
+                    butt.prop('checked',false);
+                }
+            }else{
+                layer.msg('权限获取失败', {
+                    offset: '15px'
+                    ,icon: 2
+                    ,time: 1000
+                });
+            }
+
+        }
+    })
+    form.render(null, 'component-form-group');
+  /* 自定义验证规则 */
+  form.verify({
+    title: function(value){
+      if(value.length < 5){
+        return '权限名至少得2个字啊';
+      }
+    }
+    ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+    ,content: function(value){
+      layedit.sync(editIndex);
+    }
+  });
+  
+  /* 监听指定开关 */
+  form.on('switch(component-form-switchTest)', function(data){
+/*    layer.msg('开关checked：'+ (this.checked ? 'true' : 'false'), {
+      offset: '6px'
+    });*/
+    layer.tips('温馨提示：on表示启用，off停用', data.othis)
+  });
+  
+  /* 监听提交 */
+  form.on('submit(component-form-demo1)', function(data){
+      admin.req({
+          url: '../api/user/register?token='+layui.data('layuiAdmin').token
+          ,data: data.field
+          ,async: false
+          ,type:'post'
+          ,done: function(res){
+              if(res.code == 0){
+                  layer.msg('权限添加成功', {
+                      offset: '15px'
+                      ,icon: 1
+                      ,time: 1000
+                  });
+              }else{
+                  layer.msg('权限添加失败', {
+                      offset: '15px'
+                      ,icon: 2
+                      ,time: 1000
+                  });
+              }
+              parent.layer.closeAll();
+              parent.layui.table.reload('table-admin');
+          }
+      })
+  });
+});
+</script>

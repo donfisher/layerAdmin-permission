@@ -20,6 +20,10 @@
         "name": "administrators-rule"
         ,"title": "角色管理"
         ,"jump": "user/administrators/role"
+    },{
+        "name": "administrators-permission"
+        ,"title": "权限管理"
+        ,"jump": "user/administrators/permission"
     }]
 },
     {
