@@ -1,7 +1,8 @@
 <p align="center">
 <h2>
 后端基于Laravel下jwt+Dingo+permission <br>
-前端基于layuiAdmin的用户权限和Api接口开发通用轮子
+前端基于layuiAdmin的用户权限角色绑定分配和Api接口开发通用轮子。
+主要包括后台用户注册登录，权限和角色CURD，以及用户角色权限分配，开箱即用。
 </h2>
 </p>
 
