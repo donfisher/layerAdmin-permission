@@ -1,5 +1,6 @@
 <?php
 
+use App\Client;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -20,6 +21,12 @@ class CreateClientsTable extends Migration
             $table->string('user_name',50);
             $table->timestamps();
         });
+        $newUser = [
+            'user_email' => '123@abc',
+            'user_name' => 'admin',
+            'password' => bcrypt('1234567')
+        ];
+        $user = Client::create($newUser);
     }
 
     /**

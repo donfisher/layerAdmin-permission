@@ -27,7 +27,7 @@ class AuthController extends BaseController
 
     }
 
-    /**
+    /**登录
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
@@ -48,8 +48,9 @@ class AuthController extends BaseController
         return response()->json(['code'=>0,'msg'=>'登陆成功！','data'=>['access_token'=>$token]],200);
     }
 
-    /**
+    /** register注册
      * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
     {
@@ -127,7 +128,7 @@ class AuthController extends BaseController
         return new UserListResource($lists);
     }
 
-    /**
+    /**角色列表
      * @param Request $request
      * @return RoleListResource
      */
@@ -141,7 +142,7 @@ class AuthController extends BaseController
         return new RoleListResource($roleList);
     }
 
-    /**
+    /**权限列表
      * @param Request $request
      * @return PermissionListResource
      */
@@ -292,9 +293,9 @@ class AuthController extends BaseController
     }
 
     /**修改管理员状态
- * @param Request $request
- * @return \Illuminate\Http\JsonResponse
- */
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function changeAdminStatus(Request $request)
     {
         $id = $request->get('id');
