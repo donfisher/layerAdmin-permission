@@ -22,7 +22,7 @@ layuiAdmin (http://www.layui.com/admin/)
 3、此laravel框架不包含vendor目录，需要执行composer update 升级最新package(下载更新vendor目录) <br>
 4、根目录新建.env文件，配置mysql数据库信息,添加API_PREFIX=api <br>
 5、php artisan migrate 通过migrations创建数据表。<br>
-6、进入后台登录页http://localhost/permission/public/start/index.html#/user/login <br>
+6、进入后台登录页http://localhost/layerAdmin-permission/public/start/index.html#/user/login <br>
 7、默认管理员账号:123@abc  默认密码：1234567 <br>
 6、Do what you want to do...
 ## License
