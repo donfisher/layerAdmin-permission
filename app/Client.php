@@ -9,7 +9,7 @@ use Spatie\Permission\Traits\HasRoles;
 class Client extends Authenticatable
 {
     use HasRoles;
-    protected $table = 'Clients';
+    protected $table = 'clients';
     protected $primaryKey = 'id';
     protected $guarded = [];
 }

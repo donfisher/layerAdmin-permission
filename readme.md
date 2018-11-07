@@ -18,7 +18,7 @@ layuiAdmin (http://www.layui.com/admin/)
 ## Usage
 1、确保本地环境已安装composer<br>
 2、git clone 到本地目录。<br>
-3、此laravel框架不包含vendor目录，需要执行composer update 升级最新package(下载更新vendor目录)
+3、此laravel框架不包含vendor目录，需要执行composer update 升级最新package(下载更新vendor目录) <br>
 4、根目录新建.env文件，配置mysql数据库信息,添加API_PREFIX=api <br>
 5、php artisan migrate 通过migrations创建数据表。<br>
 6、进入后台登录页http://localhost/permission/public/start/index.html#/user/login <br>
